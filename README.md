@@ -2,7 +2,7 @@
 
 A simple shell script to broadcast SSH commands to multiple hosts in parallel.
 
-*Requires [GNU Parallel](http://www.gnu.org/software/parallel/)*.
+**Requires [GNU Parallel](http://www.gnu.org/software/parallel/)**.
 
 ## Usage
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 parallel_opts='--no-notice --progress -P 0'
-ssh_opts='-o StrictHostKeyChecking=no -o BatchMode=yes -x'
+ssh_opts='-o ConnectTimeout=30 -o StrictHostKeyChecking=no -o BatchMode=yes -x'
 tag_str='[{}] '
 tag_cmd="sed -e 's/^/${tag_str}/'"
 
@@ -90,7 +90,7 @@ shift $((OPTIND-1))
 
 cmd="$@"
 
-ssh_cmd="( ssh ${ssh_opts} {} '${cmd}' ) 2>&1"
+ssh_cmd="{ ssh ${ssh_opts} {} $(printf "%q" "${cmd}"); } 2>&1"
 
 if [[ "$tag" = "yes" ]]; then
     ssh_cmd="${ssh_cmd} | ${tag_cmd}"
@@ -101,7 +101,7 @@ while read line; do
     hostlist="$hostlist $line"
 done < "${hosts_file:-/proc/${$}/fd/0}"
 
-parallel_cmd="parallel ${parallel_opts} \"${ssh_cmd}\" ::: ${hostlist}"
+parallel_cmd="parallel ${parallel_opts} $(printf "%q" "${ssh_cmd}") ::: ${hostlist}"
 
 if [[ -n "$logfile" ]]; then
     parallel_cmd="$parallel_cmd > $logfile"
